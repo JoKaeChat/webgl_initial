@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<link type="text/css" rel="stylesheet" href="style.css" />
+<title>Example1</title>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec3 vPosition;
+attribute vec3 vNormal;
+
+varying vec4 fColor;    
+
+uniform mat4 modelView;
+uniform mat4 projection; 
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform vec4 lightPosition;
+uniform float shininess;
+
+void main()
+{
+    vec3 pos = -(modelView*vec4(vPosition,1.0)).xyz;
+
+    vec3 light = lightPosition.xyz;
+    vec3 L = normalize( light - pos );
+    vec3 E = normalize( -pos );
+    vec3 H = normalize( L + E );
+
+    vec4 NN = vec4(vNormal,0);
+    vec3 N = normalize( (modelView*NN).xyz);
+
+    vec4 ambient = ambientProduct;
+
+    float d_val = max( dot(L, N), 0.0 );
+    vec4 diffuse = d_val *diffuseProduct;
+
+    float s_val = pow( max(dot(N, H), 0.0), shininess );
+    vec4 specular = s_val * specularProduct;
+
+    if( dot(L, N) < 0.0 ) {
+        specular = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    
+    fColor = ambient + diffuse +specular;
+    gl_Position = projection*modelView*vec4(vPosition , 1.0);
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
+
+    varying vec4 fColor;
+    uniform vec4 uColor;
+
+
+void main()
+{   
+
+    vec4 vColor = normalize(fColor);
+    gl_FragColor = uColor * vColor;
+    gl_FragColor.a = 1.0;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="example1.js"></script>
+</head>
+
+<body>
+    <div class="ui">
+        <div class ="rotate">
+            <h3>rotate</h3>
+            <div>
+                <label for="x">x</label>
+                    <button class="rotateX_plus">+</button>
+                    <button class="rotateX_minus">-</button>
+                <label for="y">y</label>
+                    <button class="rotateY_plus">+</button>
+                    <button class="rotateY_minus">-</button>
+                <label for="z">z</label>
+                    <button class="rotateZ_plus">+</button>
+                    <button class="rotateZ_minus">-</button>
+            </div>
+        </div>
+
+        <div class ="scale">
+            <h3>스케일</h3>
+            <div>
+                <button class="scale_plus">+</button>
+                <button class="scale_minus">-</button>                
+            </div>
+        </div>
+
+        <div class ="trans">
+            <h3>이동</h3>
+            <div>
+                <button class="translate_plus">+</button>
+                <button class="translate_minus">-</button>                
+            </div>
+        </div>
+        
+
+        <div class="view">
+            <button class="top_view">탑뷰</button>
+            <button class="front_view">정면</button>
+            <button class="side_view">측면</button>
+        </div>
+
+        <div class="view">
+            <button class="light_x">조명 좌우</button>
+            <button class="light_y">조명 상하</button>
+        </div>
+    </div>
+
+
+
+<canvas id="gl-canvas" width="1200" height="600">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</body>
+</html>

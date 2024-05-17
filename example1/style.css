@@ -1,0 +1,21 @@
+.ui{
+    display:  flex;
+}
+
+.rotate{
+    margin-right:  50px;
+}
+
+.scale{
+    margin-right:  50px;
+
+}
+
+.trans{
+    margin-right:  50px;
+}
+
+.view{
+    margin-top : 50px;
+    margin-right : 50px;
+}
